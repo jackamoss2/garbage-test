@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2">
+    <Project>
+        <Name>Wilsonville Ramp</Name>
+        <Description>A ramp project in Wilsonville.</Description>
+    </Project>
+    <Points>
+        <P id="1">0 0 0</P>
+        <P id="2">1 0 0</P>
+        <P id="3">1 1 0</P>
+        <P id="4">0 1 0</P>
+        <P id="5">0.5 0.5 1</P>
+    </Points>
+    <Faces>
+        <F>1 2 5</F>
+        <F>2 3 5</F>
+        <F>3 4 5</F>
+        <F>4 1 5</F>
+    </Faces>
+</LandXML>

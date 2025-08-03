@@ -1,0 +1,26 @@
+{
+  "name": "three-controls",
+  "version": "1.0.0",
+  "description": "A project for rendering 3D geometry from LandXML data using Three.js.",
+  "main": "three.js",
+  "scripts": {
+    "start": "live-server",
+    "build": "webpack"
+  },
+  "dependencies": {
+    "three": "^0.140.0",
+    "orbit-controls": "^2.1.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.0.0",
+    "live-server": "^1.2.1"
+  },
+  "keywords": [
+    "three.js",
+    "LandXML",
+    "3D rendering"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
