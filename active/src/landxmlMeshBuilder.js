@@ -6,10 +6,6 @@ export function parseCoords(text) {
   return parts;
 }
 
-export function formatCoords(coords) {
-  return coords.map(c => c.toFixed(6)).join(" ");
-}
-
 function centerGeometry(geometry) {
   geometry.computeBoundingBox();
   const bbox = geometry.boundingBox;
@@ -30,12 +26,7 @@ function centerGeometry(geometry) {
   geometry.computeVertexNormals();
 }
 
-/**
- * Build a THREE.Mesh from LandXML string, with coordinate transform, centering,
- * your custom material, UV mapping, and double-sided rendering.
- */
 export function buildMeshFromLandXML(xmlString) {
-  // Parse XML
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "application/xml");
   const nsResolver = prefix =>
@@ -55,7 +46,7 @@ export function buildMeshFromLandXML(xmlString) {
     pointsMap.set(node.getAttribute('id'), parseCoords(node.textContent));
   }
 
-  // Collect triangle vertices from faces, applying coordinate transform
+  // Collect faces but filter out those with i="1" or neighbors containing '0'
   const faceNodes = xmlDoc.evaluate(
     '//l:F',
     xmlDoc,
@@ -63,20 +54,46 @@ export function buildMeshFromLandXML(xmlString) {
     XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
     null
   );
+
   const vertexArray = [];
+
   for (let i = 0; i < faceNodes.snapshotLength; i++) {
     const node = faceNodes.snapshotItem(i);
-    const ids = node.textContent.trim().split(/\s+/);
-    ids.forEach(id => {
+
+    // Skip faces with i="1"
+    const faceID = node.getAttribute('i');
+    if (faceID === "1") continue;
+
+    // Skip faces with neighbor '0' if you want (optional)
+    const neighborAttr = node.getAttribute('n');
+    if (neighborAttr) {
+      const neighbors = neighborAttr.trim().split(/\s+/);
+      if (neighbors.includes('0')) continue;
+    }
+
+    // Add face vertices
+    const pointIDs = node.textContent.trim().split(/\s+/);
+    let skipFace = false;
+    const faceCoords = [];
+
+    for (const id of pointIDs) {
       const coord = pointsMap.get(id);
-      if (!coord) throw new Error(`Missing point ID: ${id}`);
-      const [x, y, z] = coord;
-      // LandXML [X, Y, Z] → Three.js [X, Z, -Y]
+      if (!coord) {
+        console.warn(`Missing point ID: ${id}, skipping face`);
+        skipFace = true;
+        break;
+      }
+      faceCoords.push(coord);
+    }
+    if (skipFace) continue;
+
+    // Transform coords from LandXML [X,Y,Z] to Three.js [X,Z,-Y]
+    faceCoords.forEach(([x, y, z]) => {
       vertexArray.push(x, z, -y);
     });
   }
 
-  // Create geometry and compute normals
+  // Create geometry
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
@@ -86,11 +103,11 @@ export function buildMeshFromLandXML(xmlString) {
   // Center geometry at origin
   centerGeometry(geometry);
 
-  // UV mapping on XZ plane, with tiling
+  // UV mapping on XZ plane
   geometry.computeBoundingBox();
   const bounds = geometry.boundingBox;
-  const sizeX = bounds.max.x - bounds.min.x;
-  const sizeZ = bounds.max.z - bounds.min.z;
+  const sizeX = bounds.max.x - bounds.min.x || 1;
+  const sizeZ = bounds.max.z - bounds.min.z || 1;
 
   const positions = geometry.attributes.position;
   const uvs = [];
@@ -99,21 +116,20 @@ export function buildMeshFromLandXML(xmlString) {
     const z = positions.getZ(i);
     const u = (x - bounds.min.x) / sizeX;
     const v = (z - bounds.min.z) / sizeZ;
-    uvs.push(u * 4, v * 4); // Adjust tiling factor as needed
+    uvs.push(u * 4, v * 4);
   }
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 
-  // Create your custom material with double side and flat shading
+  // Material as you specified
   const material = new THREE.MeshStandardMaterial({
-    color: 0x808080, // Concrete gray
+    color: 0x808080,
     roughness: 0.7,
     metalness: 0.1,
-    side: THREE.DoubleSide,  // Show both sides of visible faces
+    side: THREE.DoubleSide,
     flatShading: true,
   });
 
-  // Create mesh and return
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.name = 'LandXML_ConcreteSurface';
+  mesh.name = 'LandXML_FilteredSurface';
   return mesh;
 }

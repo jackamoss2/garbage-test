@@ -36,8 +36,8 @@ setupLights(scene);
 // scene.add(mesh);
 
 // const dataSource = "Wilsonville_Ramp.xml";
-// const dataSource = "EG_Harvey.xml";
-const dataSource = "FG_Harvey.xml";
+const dataSource = "EG_Harvey.xml";
+// const dataSource = "FG_Harvey.xml";
 const landXMLString = readLocalFile("../geometry/" + dataSource);
 const concreteMesh = buildMeshFromLandXML(landXMLString);
 scene.add(concreteMesh);
