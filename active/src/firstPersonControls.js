@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 
 export class FirstPersonControls {
-  constructor(camera, domElement, options = {}) {
+  constructor(camera, domElement, scene = null, options = {}) {
     this.camera = camera;
     this.domElement = domElement;
+    this.scene = scene;
 
     this.speed = options.speed || 4;
     this.sprintMultiplier = options.sprintMultiplier || 8;
@@ -36,10 +37,7 @@ export class FirstPersonControls {
     this.uiOverlay = this._createUIOverlay();
     document.body.appendChild(this.uiOverlay);
 
-    // Position UI container relative to domElement (assumed canvas)
-    // We'll position it absolutely relative to viewport
     this._updateUIPosition();
-
     window.addEventListener('resize', () => this._updateUIPosition());
 
     this.domElement.style.cursor = '';
@@ -48,11 +46,39 @@ export class FirstPersonControls {
     this._initPointerLock();
     this._initMouseButtons();
 
-    this._updateUI(); // Initialize UI text
+    this._updateUI();
+  }
+
+  frameObject(object3D) {
+    if (!object3D) return;
+
+    const box = new THREE.Box3().setFromObject(object3D);
+    if (box.isEmpty()) return;
+
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    // Adjust this factor to get camera closer or farther
+    const distance = size.length() * .2;
+
+    // Position camera offset relative to object center
+    this.position.copy(center);
+    this.position.x += distance;
+    this.position.y += distance * 0.5;
+    this.position.z += distance;
+
+    this.camera.position.copy(this.position);
+    this.camera.lookAt(center);
+
+    // Reset yaw and pitch from new camera orientation
+    const lookDir = new THREE.Vector3();
+    this.camera.getWorldDirection(lookDir);
+
+    this.yaw = Math.atan2(-lookDir.x, -lookDir.z);
+    this.pitch = Math.asin(lookDir.y);
   }
 
   _updateUIPosition() {
-    // Position UI overlay bottom-left of the canvas on screen
     const rect = this.domElement.getBoundingClientRect();
     this.uiOverlay.style.position = 'fixed';
     this.uiOverlay.style.left = `${rect.left + 10}px`;
@@ -86,7 +112,7 @@ export class FirstPersonControls {
          <div>Hold Right Mouse to sprint, Ctrl to crawl</div>
          <div style="margin-top:8px;">Press <b>E</b> to deactivate controls</div>`;
     } else {
-      this._infoText.innerHTML = 
+      this._infoText.innerHTML =
         `Press <b>E</b> to activate first person controls`;
     }
     this._updateUIPosition();
