@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { buildMeshFromLandXML } from './landxmlMeshBuilder.js';
+import { FirstPersonControls } from './firstPersonControls.js';
 import { readLocalFile } from './readLocalFile.js';
 import { setupLights } from './setupLights.js';
 
@@ -14,9 +15,7 @@ const camera = new THREE.PerspectiveCamera(
   100000                             // far clipping plane at 1000 units
 );
 
-// Position the camera in 3D space (x, y, z)
-// This places the camera 2 units right, 2 units up, and 5 units forward from the origin
-camera.position.set(2, 2, 5);
+
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -24,9 +23,18 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
-const controls = new OrbitControls(camera, renderer.domElement);
+
+// Position the camera in 3D space (x, y, z)
+// This places the camera 2 units right, 2 units up, and 5 units forward from the origin
+camera.position.set(2, 2, 5);
+// const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new FirstPersonControls(camera, renderer.domElement, scene, { speed: 0.2 });
+
+
 
 setupLights(scene);
+
+
 
 // const geometry = createLandXMLGeometry();
 // const material = createWireFrameMaterial();
