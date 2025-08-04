@@ -8,11 +8,14 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x202020);
 
 const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
+  75,                              // fov: 75 degrees
+  window.innerWidth / window.innerHeight,  // aspect ratio matches browser window
+  0.1,                             // near clipping plane at 0.1 units
+  100000                             // far clipping plane at 1000 units
 );
+
+// Position the camera in 3D space (x, y, z)
+// This places the camera 2 units right, 2 units up, and 5 units forward from the origin
 camera.position.set(2, 2, 5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -32,7 +35,9 @@ setupLights(scene);
 // mesh.receiveShadow = true;
 // scene.add(mesh);
 
-const dataSource = "Wilsonville_Ramp.xml";
+// const dataSource = "Wilsonville_Ramp.xml";
+// const dataSource = "EG_Harvey.xml";
+const dataSource = "FG_Harvey.xml";
 const landXMLString = readLocalFile("../geometry/" + dataSource);
 const concreteMesh = buildMeshFromLandXML(landXMLString);
 scene.add(concreteMesh);

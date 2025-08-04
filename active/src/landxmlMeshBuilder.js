@@ -10,10 +10,6 @@ export function formatCoords(coords) {
   return coords.map(c => c.toFixed(6)).join(" ");
 }
 
-/**
- * Centers geometry vertices around (0,0,0)
- * @param {THREE.BufferGeometry} geometry 
- */
 function centerGeometry(geometry) {
   geometry.computeBoundingBox();
   const bbox = geometry.boundingBox;
@@ -35,11 +31,8 @@ function centerGeometry(geometry) {
 }
 
 /**
- * Parses LandXML string and returns a THREE.Mesh with concrete texture applied,
- * transforming LandXML coordinates to Three.js coordinate system,
- * and centering the mesh at the origin.
- * @param {string} xmlString - LandXML content string.
- * @returns {THREE.Mesh}
+ * Build a THREE.Mesh from LandXML string, with coordinate transform, centering,
+ * your custom material, UV mapping, and double-sided rendering.
  */
 export function buildMeshFromLandXML(xmlString) {
   // Parse XML
@@ -62,7 +55,7 @@ export function buildMeshFromLandXML(xmlString) {
     pointsMap.set(node.getAttribute('id'), parseCoords(node.textContent));
   }
 
-  // Collect triangle vertices from faces, transforming coords to Three.js space
+  // Collect triangle vertices from faces, applying coordinate transform
   const faceNodes = xmlDoc.evaluate(
     '//l:F',
     xmlDoc,
@@ -83,17 +76,17 @@ export function buildMeshFromLandXML(xmlString) {
     });
   }
 
-  // Build geometry and compute normals
+  // Create geometry and compute normals
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(new Float32Array(vertexArray), 3)
   );
 
-  // Center geometry around (0,0,0)
+  // Center geometry at origin
   centerGeometry(geometry);
 
-  // UV mapping — planar projection on XZ plane with tiling
+  // UV mapping on XZ plane, with tiling
   geometry.computeBoundingBox();
   const bounds = geometry.boundingBox;
   const sizeX = bounds.max.x - bounds.min.x;
@@ -106,19 +99,20 @@ export function buildMeshFromLandXML(xmlString) {
     const z = positions.getZ(i);
     const u = (x - bounds.min.x) / sizeX;
     const v = (z - bounds.min.z) / sizeZ;
-    uvs.push(u * 4, v * 4); // 4 = tiling factor, adjust as needed
+    uvs.push(u * 4, v * 4); // Adjust tiling factor as needed
   }
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 
-const material = new THREE.MeshStandardMaterial({
-    color: 0x808080, // Concrete color
+  // Create your custom material with double side and flat shading
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x808080, // Concrete gray
     roughness: 0.7,
     metalness: 0.1,
-    side: THREE.DoubleSide,
-    flatShading: true
+    side: THREE.DoubleSide,  // Show both sides of visible faces
+    flatShading: true,
   });
 
-  // Return the mesh
+  // Create mesh and return
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'LandXML_ConcreteSurface';
   return mesh;
