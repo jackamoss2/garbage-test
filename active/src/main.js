@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
-import { createWaveGeometry } from './createGeometry.js';
-import { createConcreteMaterial } from './createMaterial.js';
+import { buildMeshFromLandXML } from './landxmlMeshBuilder.js';
+import { readLocalFile } from './readLocalFile.js';
 import { setupLights } from './setupLights.js';
 
 const scene = new THREE.Scene();
@@ -25,12 +25,17 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 setupLights(scene);
 
-const geometry = createWaveGeometry();
-const material = createConcreteMaterial();
-const mesh = new THREE.Mesh(geometry, material);
-mesh.castShadow = true;
-mesh.receiveShadow = true;
-scene.add(mesh);
+// const geometry = createLandXMLGeometry();
+// const material = createWireFrameMaterial();
+// const mesh = new THREE.Mesh(geometry, material);
+// mesh.castShadow = true;
+// mesh.receiveShadow = true;
+// scene.add(mesh);
+
+const dataSource = "Wilsonville_Ramp.xml";
+const landXMLString = readLocalFile("../geometry/" + dataSource);
+const concreteMesh = buildMeshFromLandXML(landXMLString);
+scene.add(concreteMesh);
 
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
