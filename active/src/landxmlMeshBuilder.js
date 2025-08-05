@@ -46,7 +46,7 @@ export function buildMeshFromLandXML(xmlString) {
     pointsMap.set(node.getAttribute('id'), parseCoords(node.textContent));
   }
 
-  // Collect faces but filter out those with i="1" or neighbors containing '0'
+  // Collect faces
   const faceNodes = xmlDoc.evaluate(
     '//l:F',
     xmlDoc,
@@ -60,50 +60,50 @@ export function buildMeshFromLandXML(xmlString) {
   for (let i = 0; i < faceNodes.snapshotLength; i++) {
     const node = faceNodes.snapshotItem(i);
 
-    // Skip faces with i="1"
-    const faceID = node.getAttribute('i');
-    if (faceID === "1") continue;
+    // Skip faces with i="1" (optional)
+    if (node.getAttribute('i') === "1") continue;
 
-    // Skip faces with neighbor '0' if you want (optional)
+    // Skip faces with neighbor='0' (optional)
     const neighborAttr = node.getAttribute('n');
-    if (neighborAttr) {
-      const neighbors = neighborAttr.trim().split(/\s+/);
-      if (neighbors.includes('0')) continue;
-    }
+    if (neighborAttr && neighborAttr.trim().split(/\s+/).includes('0')) continue;
 
-    // Add face vertices
     const pointIDs = node.textContent.trim().split(/\s+/);
-    let skipFace = false;
     const faceCoords = [];
 
     for (const id of pointIDs) {
       const coord = pointsMap.get(id);
       if (!coord) {
         console.warn(`Missing point ID: ${id}, skipping face`);
-        skipFace = true;
+        faceCoords.length = 0;
         break;
       }
       faceCoords.push(coord);
     }
-    if (skipFace) continue;
 
-    // Transform coords from LandXML [X,Y,Z] to Three.js [X,Z,-Y]
+    if (faceCoords.length !== 3) continue;
+
     faceCoords.forEach(([x, y, z]) => {
-      vertexArray.push(x, z, -y);
+      vertexArray.push(x, y, z); // LandXML coordinate system: X, Y, Z
     });
   }
 
-  // Create geometry
+  // === Create geometry ===
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(new Float32Array(vertexArray), 3)
   );
 
+  // Rotate from Y-up (LandXML) to Z-up (Three.js)
+  geometry.rotateX(-Math.PI / 2);
+
+  // ✅ Flip Z axis to fix mirrored north-south orientation
+  geometry.scale(1, 1, -1);
+
   // Center geometry at origin
   centerGeometry(geometry);
 
-  // UV mapping on XZ plane
+  // UV mapping (XZ plane)
   geometry.computeBoundingBox();
   const bounds = geometry.boundingBox;
   const sizeX = bounds.max.x - bounds.min.x || 1;
@@ -116,20 +116,20 @@ export function buildMeshFromLandXML(xmlString) {
     const z = positions.getZ(i);
     const u = (x - bounds.min.x) / sizeX;
     const v = (z - bounds.min.z) / sizeZ;
-    uvs.push(u * 4, v * 4);
+    uvs.push(u * 4, v * 4); // scale UVs
   }
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 
-  // Material as you specified
+  // Material (change to glow/wireframe if needed)
   const material = new THREE.MeshStandardMaterial({
-    color: 0x808080,
-    roughness: 0.7,
-    metalness: 0.1,
+    color: 0x8080ff,
+    roughness: 0.6,
+    metalness: 0.2,
     side: THREE.DoubleSide,
-    flatShading: true,
+    flatShading: true
   });
 
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.name = 'LandXML_FilteredSurface';
+  mesh.name = 'LandXML_Surface';
   return mesh;
 }
