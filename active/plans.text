@@ -1,3 +1,18 @@
 to do
 
-- add perspective on first 
+=== basic ===
+- refine current UI
+- better lighting
+- improved background (texture sphere?)
+- add points/toggle on-off
+- raycast target face, highlight
+
+=== big === 
+- refactor to allow for multiple surfaces (manual?)
+    - surface style editor
+- add google earth option
+- save setup
+    - first use save.txt
+    - later DB
+- add pipe networks!!!
+- other object tpyes; pressure network, alignment, corridor?
