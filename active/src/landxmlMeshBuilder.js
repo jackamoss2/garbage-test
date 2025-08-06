@@ -6,25 +6,7 @@ export function parseCoords(text) {
   return parts;
 }
 
-function centerGeometry(geometry) {
-  geometry.computeBoundingBox();
-  const bbox = geometry.boundingBox;
-
-  const offsetX = (bbox.min.x + bbox.max.x) / 2;
-  const offsetY = (bbox.min.y + bbox.max.y) / 2;
-  const offsetZ = (bbox.min.z + bbox.max.z) / 2;
-
-  const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i++) {
-    position.setX(i, position.getX(i) - offsetX);
-    position.setY(i, position.getY(i) - offsetY);
-    position.setZ(i, position.getZ(i) - offsetZ);
-  }
-
-  position.needsUpdate = true;
-  geometry.computeBoundingBox();
-  geometry.computeVertexNormals();
-}
+// Remove centerGeometry call from here
 
 export function buildMeshFromLandXML(xmlString) {
   const parser = new DOMParser();
@@ -60,10 +42,8 @@ export function buildMeshFromLandXML(xmlString) {
   for (let i = 0; i < faceNodes.snapshotLength; i++) {
     const node = faceNodes.snapshotItem(i);
 
-    // Skip faces with i="1" (optional)
     if (node.getAttribute('i') === "1") continue;
 
-    // Skip faces with neighbor='0' (optional)
     const neighborAttr = node.getAttribute('n');
     if (neighborAttr && neighborAttr.trim().split(/\s+/).includes('0')) continue;
 
@@ -83,27 +63,23 @@ export function buildMeshFromLandXML(xmlString) {
     if (faceCoords.length !== 3) continue;
 
     faceCoords.forEach(([x, y, z]) => {
-      vertexArray.push(x, y, z); // LandXML coordinate system: X, Y, Z
+      vertexArray.push(x, y, z);
     });
   }
 
-  // === Create geometry ===
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(new Float32Array(vertexArray), 3)
   );
 
-  // Rotate from Y-up (LandXML) to Z-up (Three.js)
+  // Rotate and flip
   geometry.rotateX(-Math.PI / 2);
-
-  // ✅ Flip Z axis to fix mirrored north-south orientation
   geometry.scale(1, 1, -1);
 
-  // Center geometry at origin
-  centerGeometry(geometry);
+  // No centerGeometry call here
 
-  // UV mapping (XZ plane)
+  // UV mapping
   geometry.computeBoundingBox();
   const bounds = geometry.boundingBox;
   const sizeX = bounds.max.x - bounds.min.x || 1;
@@ -116,11 +92,10 @@ export function buildMeshFromLandXML(xmlString) {
     const z = positions.getZ(i);
     const u = (x - bounds.min.x) / sizeX;
     const v = (z - bounds.min.z) / sizeZ;
-    uvs.push(u * 4, v * 4); // scale UVs
+    uvs.push(u * 4, v * 4);
   }
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 
-  // Material (change to glow/wireframe if needed)
   const material = new THREE.MeshStandardMaterial({
     color: 0x8080ff,
     roughness: 0.6,
@@ -131,5 +106,6 @@ export function buildMeshFromLandXML(xmlString) {
 
   const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'LandXML_Surface';
+
   return mesh;
 }

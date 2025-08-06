@@ -1,8 +1,6 @@
-// src/sceneOrganizer.js
-
 import * as THREE from 'three';
 
-export function wrapMeshesInGroups(meshes, sceneObjectsGroup) {
+export function wrapMeshesInGroups(meshes, sceneObjectsGroup, sharedOffset = null) {
   const visibilityControls = [];
 
   meshes.forEach((mesh) => {
@@ -10,6 +8,12 @@ export function wrapMeshesInGroups(meshes, sceneObjectsGroup) {
     const nickname = mesh.userData.nickname || mesh.name || 'Surface';
 
     group.name = nickname;
+
+    // Apply the shared offset to the group so all objects align properly
+    if (sharedOffset instanceof THREE.Vector3) {
+      group.position.copy(sharedOffset);
+    }
+
     group.add(mesh);
     sceneObjectsGroup.add(group);
 

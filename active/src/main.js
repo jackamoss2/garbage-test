@@ -17,7 +17,10 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100000
 );
-camera.position.set(2, 2, 5);
+
+// Position the camera near the origin, looking at (0,0,0)
+camera.position.set(0, 50, 100);
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -54,11 +57,12 @@ const visibilityControls = wrapMeshesInGroups(loadedMeshes, sceneObjectsGroup);
 addModuleControl('Objects', visibilityControls, sceneObjectsGroup);
 
 backgroundGrid.updateGrid();
+
 if (loadedMeshes.length > 0) {
   controls.frameObject(loadedMeshes[0]);
 }
 
-const infoUI = new InfoUI('ui-root', 'ui-pin-toggle');
+const infoUI = new InfoUI('ui-root');
 
 const controlPanel = document.getElementById('control-panel');
 
