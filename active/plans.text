@@ -6,13 +6,28 @@ to do
 - improved background (texture sphere?)
 - add points/toggle on-off
 - raycast target face, highlight
+- surface style editor (temp)
+- make test xml file
+    - EG section of Harvey
+        - intersection and short bit of road, select whatever looks most simple to recreate 2d linework for
+    - FG
+    - Pipe networks
+        - w, ss, sd, g, t
+        - ex and props
+        - service lines
+    - pressure network?
+    - alignment?
+        - horiz & vert
+    - corridor?
+    - 2d linework
+    - 30% sheet pdf
 
 === big === 
-- refactor to allow for multiple surfaces (manual?)
-    - surface style editor
-- add google earth option
+- add google earth option?
 - save setup
-    - first use save.txt
+    - first use save.txt, prompt to download file, upload back.
+        - download style state, landxml, or package of both
+        - add file panel to ui, icons to drag upload, download icons
     - later DB
-- add pipe networks!!!
+- add pipe networks!
 - other object tpyes; pressure network, alignment, corridor?
