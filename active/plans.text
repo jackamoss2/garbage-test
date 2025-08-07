@@ -21,8 +21,16 @@ to do
     - corridor?
     - 2d linework
     - 30% sheet pdf
+- pull material style from aws and revert style/lighting
 
 === big === 
+- add ability to overlay PDF on scene.
+    - isometric view
+    - slider to move pdf vertically, cut three.js scene @ plane of pdf
+    - not sure how to orient to match up
+    - toggle view/visibility
+    - possible to project annotation down onto surface?
+        - would be awesome to see elevation callouts
 - add google earth option?
 - save setup
     - first use save.txt, prompt to download file, upload back.
@@ -31,3 +39,5 @@ to do
     - later DB
 - add pipe networks!
 - other object tpyes; pressure network, alignment, corridor?
+- add blender objects
+    - trees, fire hydrants, manhole lids, power poles, fences
