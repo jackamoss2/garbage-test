@@ -49,7 +49,7 @@ canvas {
   color: #111;
   font-family: sans-serif;
   overflow-y: auto;
-  padding: 1rem 1rem 1rem 1rem;
+  padding: 1rem;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   transition: transform 0.15s ease;
@@ -59,17 +59,23 @@ canvas {
   transform: translateX(100%);
 }
 
+/* === UI PANEL CONTAINER - stacks pin + bubbles vertically === */
+#ui-panel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 10px;
+}
+
 /* === PIN BUTTON === */
 #ui-pin-toggle {
-  position: absolute;
-  top: 10px;
-  left: 10px;
   background: none;
   border: none;
   cursor: pointer;
   color: gray;
   font-size: 18px;
   outline: none;
+  align-self: flex-start; /* left align */
   transition: none; /* no fade */
 }
 
@@ -79,11 +85,6 @@ canvas {
 
 #ui-pin-toggle:focus {
   outline: none;
-}
-
-/* Add some padding-top so first module-control isn't under the pin */
-#control-panel > .module-control {
-  margin-top: 40px;
 }
 
 /* === MODULE CONTAINER === */
@@ -115,25 +116,54 @@ canvas {
   margin-right: 0.5rem;
 }
 
-/* === KEYBOARD STYLING === */
-.keyboard-keys {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 4px;
+/* === LIGHT ROTATION SLIDER CONTROL === */
+.control-item {
+  margin-bottom: 1rem;
+  background-color: #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+  font-family: sans-serif;
+  color: #111;
 }
 
-.key-row {
-  display: flex;
-  gap: 6px;
-  margin: 2px 0;
+.control-item label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
+  cursor: pointer;
 }
 
-.key {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid #999;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-weight: bold;
-  font-size: 13px;
+.control-item .slider {
+  width: 100%;
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+  background: #bbb;
+  outline: none;
+}
+
+/* Chrome/Safari slider thumb */
+.control-item .slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #666;
+  cursor: pointer;
+  border: 1px solid #444;
+  margin-top: -5px;
+}
+
+/* Firefox slider thumb */
+.control-item .slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #666;
+  cursor: pointer;
+  border: 1px solid #444;
 }

@@ -42,10 +42,10 @@ export function buildMeshFromLandXML(xmlString) {
   for (let i = 0; i < faceNodes.snapshotLength; i++) {
     const node = faceNodes.snapshotItem(i);
 
+    // Skip faces marked as invisible (i="1") ONLY
     if (node.getAttribute('i') === "1") continue;
 
-    const neighborAttr = node.getAttribute('n');
-    if (neighborAttr && neighborAttr.trim().split(/\s+/).includes('0')) continue;
+    // Removed neighbor attribute check to avoid hiding border faces
 
     const pointIDs = node.textContent.trim().split(/\s+/);
     const faceCoords = [];
@@ -73,13 +73,13 @@ export function buildMeshFromLandXML(xmlString) {
     new THREE.BufferAttribute(new Float32Array(vertexArray), 3)
   );
 
-  // Rotate and flip
+  // Rotate and flip to align with Three.js coordinates
   geometry.rotateX(-Math.PI / 2);
   geometry.scale(1, 1, -1);
 
   // No centerGeometry call here
 
-  // UV mapping
+  // UV mapping for texture coordinates
   geometry.computeBoundingBox();
   const bounds = geometry.boundingBox;
   const sizeX = bounds.max.x - bounds.min.x || 1;

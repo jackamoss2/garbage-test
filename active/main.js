@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'OrbitControls';
-import { FirstPersonControls } from './firstPersonControls.js';
-import { setupLights } from './setupLights.js';
-import { BackgroundGrid } from './backgroundGrid.js';
-import { SceneObjectsManager } from './sceneObjectsManager.js';
-import { InfoUI } from './infoUI.js';
-import { addModuleControl } from './uiPanelBuilder.js';
-import { wrapMeshesInGroups } from './sceneOrganizer.js';
+// import { OrbitControls } from 'OrbitControls';
+import { FirstPersonControls } from './src/firstPersonControls.js';
+import { LightsManager } from './src/lightsManager.js';
+import { BackgroundGrid } from './src/backgroundGrid.js';
+import { SceneObjectsManager } from './src/sceneObjectsManager.js';
+import { InfoUI } from './src/infoUI.js';
+import { addModuleControl } from './src/uiPanelBuilder.js';
+import { wrapMeshesInGroups } from './src/sceneOrganizer.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x202020);
@@ -18,7 +18,6 @@ const camera = new THREE.PerspectiveCamera(
   100000
 );
 
-// Position the camera near the origin, looking at (0,0,0)
 camera.position.set(0, 50, 100);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -34,7 +33,10 @@ const controls = new FirstPersonControls(camera, renderer.domElement, scene, {
   speed: 4
 });
 
-setupLights(scene);
+// New: append UI bubbles inside #ui-panel-container for vertical stacking
+const uiPanelContainer = document.getElementById('ui-panel-container');
+
+const lightManager = new LightsManager(scene, uiPanelContainer);
 
 const backgroundGrid = new BackgroundGrid(scene, {
   divisions: 100,
@@ -54,7 +56,7 @@ const loadedMeshes = sceneObjectsManager.getObjects();
 
 const visibilityControls = wrapMeshesInGroups(loadedMeshes, sceneObjectsGroup);
 
-addModuleControl('Objects', visibilityControls, sceneObjectsGroup);
+addModuleControl('Objects', visibilityControls, sceneObjectsGroup, uiPanelContainer);
 
 backgroundGrid.updateGrid();
 
@@ -64,14 +66,12 @@ if (loadedMeshes.length > 0) {
 
 const infoUI = new InfoUI('ui-root');
 
-const controlPanel = document.getElementById('control-panel');
-
 function hidePanel() {
-  controlPanel.classList.add('hidden');
+  uiPanelContainer.parentElement.classList.add('hidden'); // hides #control-panel
 }
 
 function showPanel() {
-  controlPanel.classList.remove('hidden');
+  uiPanelContainer.parentElement.classList.remove('hidden');
 }
 
 function onEnterControls() {
