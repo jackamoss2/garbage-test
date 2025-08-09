@@ -47,8 +47,9 @@ const sceneObjectsGroup = new THREE.Group();
 scene.add(sceneObjectsGroup);
 
 const sceneObjectsManager = new SceneObjectsManager('../geometry/', [
-  'EG_Harvey.xml',
-  'FG_Harvey.xml'
+  // 'EG.xml',
+  // 'FG.xml'
+  'EG2.xml'
 ]);
 
 sceneObjectsManager.loadAll();

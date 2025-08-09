@@ -3,7 +3,11 @@ import { readLocalFile } from './readLocalFile.js';
 import * as THREE from 'three';
 
 export class SceneObjectsManager {
-  constructor(folderPath, fileList = ['EG_Harvey.xml', 'FG_Harvey.xml']) {
+  constructor(folderPath, fileList = [
+    // 'EG.xml',
+    // 'FG.xml'
+    'EG2.xml'
+  ]) {
     this.folderPath = folderPath;
     this.fileList = fileList;
     this.objects = [];
