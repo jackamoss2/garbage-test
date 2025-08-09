@@ -24,6 +24,10 @@ to do
 - pull material style from aws and revert style/lighting
 
 === big === 
+- add first person tools
+    - infrared gun to measure elevation
+    - swap edge tool
+    - slope (smart level gimmick model?)
 - add ability to overlay PDF on scene.
     - isometric view
     - slider to move pdf vertically, cut three.js scene @ plane of pdf

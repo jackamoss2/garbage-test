@@ -14,6 +14,15 @@ export class LightsManager {
     this.directionalLight.shadow.camera.far = 20;
     scene.add(this.directionalLight);
 
+    this.directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+    this.directionalLight2.position.set(-5, -10, -7);
+    this.directionalLight2.castShadow = true;
+    this.directionalLight2.shadow.mapSize.width = 1024;
+    this.directionalLight2.shadow.mapSize.height = 1024;
+    this.directionalLight2.shadow.camera.near = 1;
+    this.directionalLight2.shadow.camera.far = 20;
+    scene.add(this.directionalLight2);
+
     this.ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(this.ambientLight);
 
@@ -62,6 +71,9 @@ export class LightsManager {
     this.directionalLight.position.x = radius * Math.cos(radians);
     this.directionalLight.position.z = radius * Math.sin(radians);
     this.directionalLight.lookAt(0, 0, 0);
+    this.directionalLight2.position.x = -radius * Math.cos(radians);
+    this.directionalLight2.position.z = -radius * Math.sin(radians);
+    this.directionalLight2.lookAt(0, 0, 0);
   }
 
   dispose() {

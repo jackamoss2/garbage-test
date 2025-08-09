@@ -42,10 +42,8 @@ export function buildMeshFromLandXML(xmlString) {
   for (let i = 0; i < faceNodes.snapshotLength; i++) {
     const node = faceNodes.snapshotItem(i);
 
-    // Skip faces marked as invisible (i="1") ONLY
+    // Skip faces marked as invisible (i="1") 
     if (node.getAttribute('i') === "1") continue;
-
-    // Removed neighbor attribute check to avoid hiding border faces
 
     const pointIDs = node.textContent.trim().split(/\s+/);
     const faceCoords = [];
@@ -77,8 +75,6 @@ export function buildMeshFromLandXML(xmlString) {
   geometry.rotateX(-Math.PI / 2);
   geometry.scale(1, 1, -1);
 
-  // No centerGeometry call here
-
   // UV mapping for texture coordinates
   geometry.computeBoundingBox();
   const bounds = geometry.boundingBox;
@@ -97,11 +93,11 @@ export function buildMeshFromLandXML(xmlString) {
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
 
   const material = new THREE.MeshStandardMaterial({
-    color: 0x8080ff,
-    roughness: 0.6,
-    metalness: 0.2,
+    color: 0x808080,
+    roughness: 1.0,
+    metalness: 0.0,
     side: THREE.DoubleSide,
-    flatShading: true
+    flatShading: true,
   });
 
   const mesh = new THREE.Mesh(geometry, material);
